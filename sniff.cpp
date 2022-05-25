@@ -1,28 +1,36 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include "sdk_structs.h"
 #include "structs.h"
 #include "string_utils.h"
  
- void setup()
- {
-   //Serial setup
-   Serial.begin(115200);
+extern "C"
+{
+  #include "user_interface.h"
+}
 
-   //Set station mode, callback, then cycle promisc. mode
-   wifi_set_opmode(STATION_MODE);
-   wifi_promiscuous_enable(0);
-   WiFi.disconnect();
+// According to the SDK documentation, the packet type can be inferred from the
+// size of the buffer. We are ignoring this information and parsing the type-subtype
+// from the packet header itself. Still, this is here for reference.
+wifi_promiscuous_pkt_type_t packet_type_parser(uint16_t len)
+{
+  	switch(len)
+    {
+      // If only rx_ctrl is returned, this is an unsupported packet
+      case sizeof(wifi_pkt_rx_ctrl_t):
+      return WIFI_PKT_MISC;
 
-   wifi_set_promiscuous_rx_cb(wifi_sniffer_packet_handler);
-   wifi_promiscuous_enable(1);
-   wifi_set_channel(9);
+      // Management packet
+      case sizeof(wifi_pkt_mgmt_t):
+      return WIFI_PKT_MGMT;
 
-   //Print header
-   Serial.printf(...)
- }
+      // Data packet
+      default:
+      return WIFI_PKT_DATA;
+    }
+}
 
-// Package Received Callback
+// In this example, the packet handler function does all the parsing and output work.
+// This is NOT ideal.
 void wifi_sniffer_packet_handler(uint8_t *buff, uint16_t len)
 {
   // First layer: type cast the received buffer into our generic SDK structure
@@ -82,4 +90,31 @@ void wifi_sniffer_packet_handler(uint8_t *buff, uint16_t len)
 
     Serial.printf("%s", ssid);
   }
+}
+
+
+void setup()
+{
+  // Serial setup
+  Serial.begin(115200);
+  delay(10);
+  wifi_set_channel(9);
+
+  // Wifi setup
+  wifi_set_opmode(STATION_MODE);
+  wifi_promiscuous_enable(0);
+  WiFi.disconnect();
+
+  // Set sniffer callback
+  wifi_set_promiscuous_rx_cb(wifi_sniffer_packet_handler);
+  wifi_promiscuous_enable(1);
+
+  // Print header
+  Serial.printf("\n\n     MAC Address 1|      MAC Address 2|      MAC Address 3| Ch| RSSI| Pr| T(S)  |           Frame type         |TDS|FDS| MF|RTR|PWR| MD|ENC|STR|   SSID");
+
+}
+
+void loop()
+{
+ delay(10);
 }
