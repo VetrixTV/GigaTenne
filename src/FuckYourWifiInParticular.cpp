@@ -27,7 +27,7 @@ bool Attack::sendDeauht(uint8_t* apMac, uint8_t* stMac, uint8_t reason, uint8_t 
     memcpy(&deauthpkt[10], apMac, 6);
     memcpy(&deauthpkt[16], apMac, 6);
     deauthpkt[24] = reason;
-     deauthpkt[0] = 0xc0;
+    deauthpkt[0] = 0xc0;
 
     if (sendPacket(deauthpkt, packetSize, ch, true)) {
         success = true;
